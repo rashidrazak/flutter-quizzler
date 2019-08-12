@@ -39,23 +39,50 @@ class _QuizPageState extends State<QuizPage> {
     bool correctAnswer = quizBrain.getQuestionAnswer();
 
     setState(() {
-      if (userPickedAnswer == correctAnswer) {
-        scoreKeeper.add(
-          Icon(
-            Icons.check,
-            color: Colors.green,
-          ),
-        );
-      } else {
-        scoreKeeper.add(
-          Icon(
-            Icons.close,
-            color: Colors.red,
-          ),
-        );
-      }
+      int totalScore = quizBrain.getTotalScore();
+      int totalQuestion = quizBrain.getQuestionsLength();
 
-      quizBrain.nextQuestion();
+      if (quizBrain.isFinished()) {
+        Alert(
+          context: context,
+          type: AlertType.success,
+          style: AlertStyle(isCloseButton: false),
+          title: 'Finished!',
+          desc: 'Your score: $totalScore/$totalQuestion',
+          buttons: [
+            DialogButton(
+              child: Text(
+                "RESTART",
+                style: TextStyle(color: Colors.white, fontSize: 20),
+              ),
+              onPressed: () => Navigator.pop(context),
+              color: Color.fromRGBO(0, 179, 134, 1.0),
+            ),
+          ],
+        ).show();
+
+        quizBrain.reset();
+        scoreKeeper = [];
+      } else {
+        if (userPickedAnswer == correctAnswer) {
+          quizBrain.increaseScore();
+          scoreKeeper.add(
+            Icon(
+              Icons.check,
+              color: Colors.green,
+            ),
+          );
+        } else {
+          scoreKeeper.add(
+            Icon(
+              Icons.close,
+              color: Colors.red,
+            ),
+          );
+        }
+
+        quizBrain.nextQuestion();
+      }
     });
   }
 
